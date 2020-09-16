@@ -47,7 +47,14 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // <Your code here >
 
-var Person; /* = <Your Model> */
+const personSchema = new mongoose.Schema({
+	name: { type: String, required: true },
+	age: Number,
+	favoriteFoods: [String],
+});
+
+/* = <Your Model> */
+const Person = mongoose.model("Person", personSchema);
 
 // **Note**: Glitch is a real server, and in real servers interactions with
 // the db are placed in handler functions, to be called when some event happens
@@ -85,7 +92,20 @@ var Person; /* = <Your Model> */
 // });
 
 var createAndSavePerson = function (done) {
-	done(null /*, data*/);
+	let francesca = new Person({
+		name: "Francesca",
+		age: 20,
+		favoriteFoods: ["sushi"],
+	});
+
+	francesca.save((error, data) => {
+		if (error) {
+			console.log(error);
+		} else {
+			done(null, data);
+		}
+	});
+	//done(null /*, data*/);
 };
 
 /** 4) Create many People with `Model.create()` */
