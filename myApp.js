@@ -98,13 +98,9 @@ var createAndSavePerson = function (done) {
 		favoriteFoods: ["sushi"],
 	});
 
-	francesca.save((error, data) => {
-		if (error) {
-			console.log(error);
-		} else {
-			done(null, data);
-		}
-	});
+	francesca.save((error, data) =>
+		error ? console.log(error) : done(null, data)
+	);
 	//done(null /*, data*/);
 };
 
@@ -119,7 +115,9 @@ var createAndSavePerson = function (done) {
 // Note: You can reuse the model you instantiated in the previous exercise.
 
 var createManyPeople = function (arrayOfPeople, done) {
-	done(null /*, data*/);
+	Person.create(arrayOfPeople, (err, res) =>
+		err ? console.log(err) : done(null, res)
+	);
 };
 
 /** # C[R]UD part II - READ #
@@ -134,7 +132,9 @@ var createManyPeople = function (arrayOfPeople, done) {
 // Use the function argument `personName` as search key.
 
 var findPeopleByName = function (personName, done) {
-	done(null /*, data*/);
+	Person.find({ name: personName }, (err, res) =>
+		err ? console.log(err) : done(null, res)
+	);
 };
 
 /** 6) Use `Model.findOne()` */
@@ -147,7 +147,9 @@ var findPeopleByName = function (personName, done) {
 // argument `food` as search key
 
 var findOneByFood = function (food, done) {
-	done(null /*, data*/);
+	Person.findOne({ favoriteFoods: food }, (err, res) => {
+		err ? console.log(err) : done(null, res);
+	});
 };
 
 /** 7) Use `Model.findById()` */
@@ -160,7 +162,9 @@ var findOneByFood = function (food, done) {
 // Use the function argument 'personId' as search key.
 
 var findPersonById = function (personId, done) {
-	done(null /*, data*/);
+	Person.findById(personId)
+		.then((res) => done(null, res))
+		.catch((err) => console.log(err));
 };
 
 /** # CR[U]D part III - UPDATE # 
@@ -190,8 +194,16 @@ var findPersonById = function (personId, done) {
 
 var findEditThenSave = function (personId, done) {
 	var foodToAdd = "hamburger";
-
-	done(null /*, data*/);
+	let personToEdit = Person.findById(personId, (err, person) => {
+		if (err) {
+			console.log(err);
+		} else {
+			person.favoriteFoods.push(foodToAdd);
+			person.save((err, res) =>
+				err ? console.log(err) : done(null, res)
+			);
+		}
+	});
 };
 
 /** 9) New Update : Use `findOneAndUpdate()` */
@@ -212,7 +224,12 @@ var findEditThenSave = function (personId, done) {
 var findAndUpdate = function (personName, done) {
 	var ageToSet = 20;
 
-	done(null /*, data*/);
+	Person.findOneAndUpdate(
+		{ name: personName },
+		{ age: 20 },
+		{ new: true },
+		(err, res) => (err ? console.log(err) : done(null, res))
+	);
 };
 
 /** # CRU[D] part IV - DELETE #
@@ -226,7 +243,9 @@ var findAndUpdate = function (personName, done) {
 // As usual, use the function argument `personId` as search key.
 
 var removeById = function (personId, done) {
-	done(null /*, data*/);
+	Person.findByIdAndRemove(personId)
+		.then((res) => done(null, res))
+		.catch((err) => console.log(err));
 };
 
 /** 11) Delete many People */
@@ -241,8 +260,9 @@ var removeById = function (personId, done) {
 
 var removeManyPeople = function (done) {
 	var nameToRemove = "Mary";
-
-	done(null /*, data*/);
+	Person.remove({ name: "Mary" })
+		.then((res) => done(null, res))
+		.catch((err) => console.log(err));
 };
 
 /** # C[R]UD part V -  More about Queries # 
@@ -265,8 +285,11 @@ var removeManyPeople = function (done) {
 
 var queryChain = function (done) {
 	var foodToSearch = "burrito";
-
-	done(null /*, data*/);
+	Person.find({ favoriteFoods: foodToSearch })
+		.sort("name")
+		.limit(2)
+		.select("-age")
+		.exec((err, (res) => (err ? console.log(err) : done(null, res))));
 };
 
 /** **Well Done !!**
